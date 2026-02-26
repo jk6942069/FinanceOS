@@ -1,0 +1,2047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinanceOS — SMB Financial Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ─────────────────────────────────────────────────────────────── */
+:root {
+  --ink:      #0a0a0f;
+  --ink-2:    #1c1c28;
+  --ink-3:    #2e2e42;
+  --muted:    #6b6b88;
+  --border:   #e2e2ef;
+  --surface:  #f7f7fc;
+  --white:    #ffffff;
+  --sage:     #1a3a2e;
+  --sage-2:   #2d5a47;
+  --sage-3:   #3e7a61;
+  --sage-lt:  #e8f5ef;
+  --gold:     #c8973a;
+  --gold-lt:  #fdf6e8;
+  --red:      #c0392b;
+  --red-lt:   #fdf0ee;
+  --amber:    #d68910;
+  --amber-lt: #fef9ec;
+  --blue:     #1a4a7a;
+  --blue-lt:  #eef4fc;
+  --r:        8px;
+  --r-lg:     16px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Syne', sans-serif;
+  background: var(--ink);
+  color: var(--white);
+  overflow-x: hidden;
+}
+
+/* ── UTILITY ─────────────────────────────────────────────────────────────── */
+.mono { font-family: 'DM Mono', monospace; }
+.serif { font-family: 'DM Serif Display', serif; }
+.tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 100px;
+}
+.tag-green  { background: var(--sage-lt); color: var(--sage-2); }
+.tag-amber  { background: var(--amber-lt); color: var(--amber); }
+.tag-red    { background: var(--red-lt); color: var(--red); }
+.tag-blue   { background: var(--blue-lt); color: var(--blue); }
+.tag-ghost  { border: 1px solid rgba(255,255,255,.2); color: rgba(255,255,255,.7); }
+.dot { width:7px; height:7px; border-radius:50%; background:currentColor; flex-shrink:0; }
+
+/* ── HERO ────────────────────────────────────────────────────────────────── */
+#hero {
+  min-height: 100vh;
+  background: var(--ink);
+  position: relative;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+.hero-grain {
+  position: absolute; inset: 0; z-index: 0; opacity: .4;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.15'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+.hero-glow {
+  position: absolute; inset: 0; z-index: 0;
+  background: radial-gradient(ellipse 70% 60% at 60% 40%, rgba(61,122,97,.25) 0%, transparent 70%),
+              radial-gradient(ellipse 40% 40% at 20% 80%, rgba(200,151,58,.12) 0%, transparent 60%);
+}
+
+.hero-nav {
+  position: relative; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 28px 60px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+
+.logo {
+  font-family: 'DM Serif Display', serif; font-size: 22px; letter-spacing: -.01em;
+  color: var(--white);
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-mark {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--sage-3) 0%, var(--sage-2) 100%);
+  display: flex; align-items: center; justify-content: center; font-size: 15px;
+}
+
+.nav-links {
+  display: flex; align-items: center; gap: 32px;
+  list-style: none;
+}
+.nav-links a {
+  text-decoration: none; color: rgba(255,255,255,.55);
+  font-size: 13px; font-weight: 500; letter-spacing: .02em;
+  transition: color .2s;
+}
+.nav-links a:hover { color: var(--white); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 22px; border-radius: 100px;
+  font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .2s; text-decoration: none; border: none;
+  letter-spacing: .01em;
+}
+.btn-primary {
+  background: var(--sage-3); color: var(--white);
+  box-shadow: 0 0 0 1px var(--sage-2), 0 4px 20px rgba(61,122,97,.4);
+}
+.btn-primary:hover {
+  background: var(--sage-2); transform: translateY(-1px);
+  box-shadow: 0 0 0 1px var(--sage-2), 0 8px 30px rgba(61,122,97,.5);
+}
+.btn-ghost {
+  background: transparent; color: rgba(255,255,255,.7);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.15);
+}
+.btn-ghost:hover { color: var(--white); box-shadow: 0 0 0 1px rgba(255,255,255,.3); }
+
+.btn-dark {
+  background: var(--ink-2); color: var(--white);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.1);
+}
+
+.hero-body {
+  position: relative; z-index: 10;
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 80px 60px 60px;
+  gap: 28px;
+}
+
+.hero-eyebrow {
+  font-family: 'DM Mono', monospace; font-size: 11px;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--sage-3); display: flex; align-items: center; gap: 12px;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: ''; flex: 1; max-width: 40px; height: 1px; background: var(--sage-3); opacity: .5;
+}
+
+.hero-h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(48px, 7vw, 88px);
+  line-height: 1.04; letter-spacing: -.02em;
+  max-width: 900px;
+}
+
+.hero-h1 em { font-style: italic; color: var(--sage-3); }
+
+.hero-sub {
+  font-size: 16px; font-weight: 400; color: rgba(255,255,255,.55);
+  max-width: 560px; line-height: 1.7;
+}
+
+.hero-ctas { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: center; }
+
+.hero-stats {
+  margin-top: 24px;
+  display: flex; align-items: center; gap: 40px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  padding-top: 40px;
+}
+.stat { text-align: center; }
+.stat-num {
+  font-family: 'DM Serif Display', serif; font-size: 32px;
+  color: var(--white); letter-spacing: -.02em;
+}
+.stat-label {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  color: rgba(255,255,255,.35); text-transform: uppercase; letter-spacing: .12em;
+  margin-top: 4px;
+}
+.stat-div { width: 1px; height: 40px; background: rgba(255,255,255,.1); }
+
+/* ── LOGIN SCREEN ────────────────────────────────────────────────────────── */
+#login-screen {
+  min-height: 100vh;
+  background: var(--surface);
+  display: flex;
+}
+
+.login-left {
+  width: 480px; flex-shrink: 0;
+  background: var(--white);
+  padding: 60px 56px;
+  display: flex; flex-direction: column;
+  border-right: 1px solid var(--border);
+}
+
+.login-logo {
+  font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--ink);
+  display: flex; align-items: center; gap: 10px; margin-bottom: 56px;
+}
+.login-logo .logo-mark { background: linear-gradient(135deg, var(--sage-3), var(--sage-2)); }
+
+.login-heading { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--ink); margin-bottom: 8px; }
+.login-sub { font-size: 14px; color: var(--muted); margin-bottom: 40px; line-height: 1.6; }
+
+.field { margin-bottom: 20px; }
+.field label { display: block; font-size: 12px; font-weight: 600; color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 8px; }
+.field input {
+  width: 100%; padding: 13px 16px;
+  border: 1.5px solid var(--border); border-radius: var(--r);
+  font-family: 'Syne', sans-serif; font-size: 14px; color: var(--ink);
+  background: var(--white); outline: none; transition: border-color .2s;
+}
+.field input:focus { border-color: var(--sage-3); box-shadow: 0 0 0 3px rgba(61,122,97,.1); }
+
+.field-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.field-row label { margin-bottom: 0; }
+.forgot { font-size: 12px; color: var(--sage-3); text-decoration: none; font-weight: 600; }
+
+.btn-login {
+  width: 100%; padding: 14px; border-radius: var(--r);
+  background: var(--ink); color: var(--white);
+  font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700;
+  border: none; cursor: pointer; margin-top: 8px; transition: all .2s; letter-spacing: .02em;
+}
+.btn-login:hover { background: var(--ink-3); transform: translateY(-1px); }
+
+.login-divider {
+  display: flex; align-items: center; gap: 14px; margin: 24px 0;
+  font-size: 12px; color: var(--muted);
+}
+.login-divider::before, .login-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.login-demo {
+  width: 100%; padding: 13px; border-radius: var(--r);
+  background: var(--surface); border: 1.5px solid var(--border); color: var(--ink-3);
+  font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s;
+}
+.login-demo:hover { border-color: var(--sage-3); color: var(--sage-2); }
+
+.login-right {
+  flex: 1; padding: 60px;
+  display: flex; flex-direction: column;
+  justify-content: center;
+  background: linear-gradient(135deg, #eef7f3 0%, #f7f7fc 100%);
+  position: relative; overflow: hidden;
+}
+
+.login-right-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 60% at 70% 30%, rgba(61,122,97,.08) 0%, transparent 70%);
+}
+
+.preview-label {
+  font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--sage-3); margin-bottom: 24px;
+  position: relative; z-index: 1;
+}
+
+.brief-preview {
+  position: relative; z-index: 1;
+  background: var(--white); border-radius: var(--r-lg);
+  box-shadow: 0 4px 40px rgba(0,0,0,.08), 0 1px 0 rgba(0,0,0,.04);
+  overflow: hidden;
+}
+
+.brief-header {
+  background: var(--ink); padding: 20px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.brief-header-left { display: flex; flex-direction: column; gap: 4px; }
+.brief-co { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--white); }
+.brief-period { font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(255,255,255,.4); letter-spacing: .12em; }
+.brief-score { text-align: right; }
+.brief-score-num { font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--sage-3); line-height: 1; }
+.brief-score-label { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(255,255,255,.3); letter-spacing: .12em; }
+
+.brief-cards {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid var(--border);
+}
+.brief-card {
+  padding: 16px 20px; border-right: 1px solid var(--border);
+}
+.brief-card:last-child { border-right: none; }
+.bc-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.bc-val { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--ink); line-height: 1; }
+.bc-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+.brief-alerts { padding: 16px 24px; display: flex; flex-direction: column; gap: 10px; }
+
+.alert-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 14px; border-radius: var(--r);
+  font-size: 12px; line-height: 1.5;
+}
+.alert-row.green { background: var(--sage-lt); }
+.alert-row.amber { background: var(--amber-lt); }
+.alert-row.red   { background: var(--red-lt); }
+.alert-icon { font-size: 14px; margin-top: 1px; flex-shrink: 0; }
+.alert-text { color: var(--ink-3); }
+.alert-text strong { color: var(--ink); display: block; margin-bottom: 2px; font-size: 12px; font-weight: 700; }
+
+.brief-footer {
+  padding: 14px 24px; background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.brief-footer-text { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
+.brief-cta {
+  font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+  color: var(--sage-3); text-decoration: none; letter-spacing: .04em;
+}
+
+/* ── DASHBOARD SCREEN ────────────────────────────────────────────────────── */
+#dashboard-screen {
+  min-height: 100vh;
+  background: var(--surface);
+  display: flex;
+}
+
+.sidebar {
+  width: 240px; flex-shrink: 0;
+  background: var(--ink);
+  display: flex; flex-direction: column;
+  padding: 0;
+  position: sticky; top: 0; height: 100vh;
+}
+
+.sidebar-logo {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white);
+  display: flex; align-items: center; gap: 10px;
+}
+.sidebar-logo .logo-mark { width: 28px; height: 28px; font-size: 13px; }
+
+.sidebar-user {
+  padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,.07);
+  display: flex; align-items: center; gap: 10px;
+}
+.sidebar-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--sage-3) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: white; flex-shrink: 0;
+}
+.sidebar-user-name { font-size: 13px; font-weight: 600; color: var(--white); line-height: 1.2; }
+.sidebar-user-biz { font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(255,255,255,.35); letter-spacing: .06em; }
+
+.sidebar-nav { flex: 1; padding: 16px 0; overflow-y: auto; }
+.nav-section-label {
+  font-family: 'DM Mono', monospace; font-size: 9px;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: rgba(255,255,255,.25); padding: 12px 24px 6px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 24px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.5);
+  cursor: pointer; transition: all .15s; border-left: 2px solid transparent;
+  position: relative;
+}
+.nav-item:hover { color: rgba(255,255,255,.85); background: rgba(255,255,255,.04); }
+.nav-item.active {
+  color: var(--white); background: rgba(255,255,255,.07);
+  border-left-color: var(--sage-3);
+}
+.nav-item .badge {
+  margin-left: auto; background: var(--red); color: var(--white);
+  font-family: 'DM Mono', monospace; font-size: 9px; font-weight: 500;
+  padding: 2px 6px; border-radius: 100px;
+}
+.nav-icon { font-size: 14px; width: 18px; text-align: center; }
+
+.sidebar-bottom {
+  padding: 16px 24px; border-top: 1px solid rgba(255,255,255,.07);
+  font-size: 12px; color: rgba(255,255,255,.3);
+}
+
+.main {
+  flex: 1; overflow-y: auto; padding: 40px 48px;
+}
+
+.page-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 32px;
+}
+.page-title {
+  font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--ink);
+  line-height: 1.1; margin-bottom: 4px;
+}
+.page-sub { font-size: 13px; color: var(--muted); }
+
+.period-selector {
+  display: flex; border: 1.5px solid var(--border); border-radius: var(--r); overflow: hidden;
+}
+.period-btn {
+  padding: 8px 16px; font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600;
+  color: var(--muted); background: var(--white); border: none; cursor: pointer; transition: all .15s;
+}
+.period-btn.active { background: var(--ink); color: var(--white); }
+
+/* Score header block */
+.score-block {
+  background: var(--ink); border-radius: var(--r-lg); padding: 32px 36px;
+  display: flex; align-items: center; gap: 40px; margin-bottom: 28px;
+  position: relative; overflow: hidden;
+}
+.score-block::after {
+  content: '';
+  position: absolute; right: -40px; top: -40px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(61,122,97,.3) 0%, transparent 70%);
+}
+.score-main { flex-shrink: 0; }
+.score-num {
+  font-family: 'DM Serif Display', serif; font-size: 72px;
+  color: var(--sage-3); line-height: 1; letter-spacing: -.03em;
+}
+.score-denom { font-family: 'DM Mono', monospace; font-size: 20px; color: rgba(255,255,255,.3); }
+.score-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .16em; color: rgba(255,255,255,.4); text-transform: uppercase; margin-top: 6px; }
+.score-divider { width: 1px; height: 72px; background: rgba(255,255,255,.1); flex-shrink: 0; }
+.score-components { display: flex; gap: 32px; flex: 1; }
+.score-comp { }
+.sc-num { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--white); }
+.sc-bar { height: 3px; border-radius: 2px; background: rgba(255,255,255,.1); margin: 6px 0; overflow: hidden; }
+.sc-fill { height: 100%; border-radius: 2px; background: var(--sage-3); }
+.sc-label { font-family: 'DM Mono', monospace; font-size: 9px; color: rgba(255,255,255,.35); letter-spacing: .12em; text-transform: uppercase; }
+.score-verdict {
+  margin-left: auto; text-align: right; flex-shrink: 0;
+}
+.sv-emoji { font-size: 32px; display: block; margin-bottom: 8px; }
+.sv-text { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+.sv-sub { font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(255,255,255,.35); }
+
+/* KPI row */
+.kpi-row {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px;
+}
+
+.kpi-card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--r-lg); padding: 20px 22px;
+  transition: box-shadow .2s;
+}
+.kpi-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.06); }
+.kpi-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.kpi-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.kpi-status { font-size: 14px; }
+.kpi-val { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--ink); line-height: 1; margin-bottom: 6px; }
+.kpi-sub { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.kpi-change { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; }
+.kpi-change.up { color: var(--sage-3); }
+.kpi-change.dn { color: var(--red); }
+
+/* Charts row */
+.charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 28px; }
+
+.panel {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--r-lg); overflow: hidden;
+}
+.panel-head {
+  padding: 18px 22px; border-bottom: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.panel-title { font-size: 13px; font-weight: 700; color: var(--ink); }
+.panel-body { padding: 22px; }
+
+/* Mini sparkline */
+.sparkline {
+  display: flex; align-items: flex-end; gap: 4px; height: 60px;
+}
+.spark-bar {
+  flex: 1; background: var(--sage-lt); border-radius: 3px 3px 0 0;
+  position: relative; transition: background .2s;
+}
+.spark-bar:hover { background: var(--sage-3); }
+.spark-bar.current { background: var(--sage-3); }
+
+/* Revenue chart SVG-less */
+.rev-chart {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; height: 80px; align-items: end;
+}
+.rev-col { display: flex; flex-direction: column; gap: 3px; }
+.rev-bar-wrap { flex: 1; display: flex; align-items: flex-end; gap: 2px; }
+.rev-bar {
+  flex: 1; border-radius: 3px 3px 0 0;
+}
+.rev-label { font-family: 'DM Mono', monospace; font-size: 8px; color: var(--muted); text-align: center; letter-spacing: .06em; }
+
+/* AR Aging */
+.ar-track {
+  height: 8px; border-radius: 4px; background: var(--border);
+  overflow: hidden; margin: 14px 0 6px;
+}
+.ar-fill {
+  height: 100%; border-radius: 4px;
+  background: linear-gradient(90deg, var(--sage-3) 0%, var(--amber) 50%, var(--red) 100%);
+}
+.ar-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+.ar-item { text-align: center; }
+.ar-label { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+.ar-val { font-size: 13px; font-weight: 700; color: var(--ink); margin-top: 2px; }
+
+/* Alerts panel */
+.alerts-section { margin-bottom: 28px; }
+.alerts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.alert-card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--r-lg); overflow: hidden;
+}
+.alert-card-header {
+  padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1.5px solid var(--border);
+}
+.alert-card-title { font-size: 13px; font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+.alert-card-body { padding: 16px 18px; }
+.alert-card-body p { font-size: 13px; color: var(--ink-3); line-height: 1.6; margin-bottom: 12px; }
+.alert-card-action {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--r); padding: 10px 14px;
+  font-size: 12px; font-weight: 600; color: var(--ink-3);
+}
+.action-icon { font-size: 13px; }
+
+/* Weekly Brief */
+.brief-full {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--r-lg); overflow: hidden;
+}
+.brief-full-header {
+  background: var(--ink); padding: 28px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.bfh-left h3 { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--white); margin-bottom: 4px; }
+.bfh-left p { font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(255,255,255,.35); letter-spacing: .12em; }
+.bfh-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+
+.brief-sections { }
+.brief-section { padding: 24px 32px; border-bottom: 1.5px solid var(--border); }
+.brief-section:last-child { border-bottom: none; }
+.bs-title {
+  font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+}
+.bs-summary { font-size: 14px; line-height: 1.7; color: var(--ink-3); }
+.bs-summary strong { color: var(--ink); }
+
+.decisions-list { display: flex; flex-direction: column; gap: 10px; }
+.decision-item {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 14px 16px; border-radius: var(--r);
+  border: 1.5px solid var(--border);
+}
+.decision-rank {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  background: var(--ink); color: var(--white);
+  font-family: 'DM Serif Display', serif; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+.decision-item h4 { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.decision-item p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.decision-item .impact {
+  margin-left: auto; flex-shrink: 0;
+  font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--sage-3); white-space: nowrap;
+}
+
+/* ARCHITECTURE SECTION */
+#architecture {
+  background: var(--white);
+  padding: 100px 60px;
+}
+
+.arch-header { text-align: center; margin-bottom: 64px; }
+.arch-eyebrow {
+  font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--sage-3); margin-bottom: 16px;
+}
+.arch-h2 { font-family: 'DM Serif Display', serif; font-size: 44px; color: var(--ink); margin-bottom: 16px; }
+.arch-sub { font-size: 16px; color: var(--muted); max-width: 560px; margin: 0 auto; line-height: 1.7; }
+
+.arch-diagram {
+  max-width: 960px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 80px 1fr 80px 1fr;
+  align-items: stretch; gap: 0;
+}
+
+.arch-layer {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--r-lg); padding: 28px 24px;
+}
+.arch-arrow {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; color: var(--border);
+}
+
+.layer-icon { font-size: 28px; margin-bottom: 14px; }
+.layer-title { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+.layer-items { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.layer-items li {
+  font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted);
+  padding: 5px 10px; background: var(--white); border-radius: 5px;
+  border: 1px solid var(--border);
+}
+
+.arch-below { max-width: 960px; margin: 32px auto 0; }
+.arch-note {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 20px 24px; background: var(--sage-lt);
+  border-radius: var(--r); border: 1.5px solid rgba(61,122,97,.2);
+}
+.arch-note-icon { font-size: 20px; flex-shrink: 0; }
+.arch-note h4 { font-size: 13px; font-weight: 700; color: var(--sage-2); margin-bottom: 4px; }
+.arch-note p { font-size: 12px; color: var(--sage-2); line-height: 1.6; }
+
+/* ROADMAP */
+#roadmap {
+  background: var(--ink);
+  padding: 100px 60px;
+}
+
+.roadmap-header { text-align: center; margin-bottom: 64px; }
+.roadmap-eyebrow {
+  font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--sage-3); margin-bottom: 16px;
+}
+.roadmap-h2 { font-family: 'DM Serif Display', serif; font-size: 44px; color: var(--white); }
+
+.phases { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 960px; margin: 0 auto; }
+
+.phase-card {
+  border-radius: var(--r-lg); padding: 28px;
+  border: 1.5px solid rgba(255,255,255,.08);
+  position: relative; overflow: hidden;
+}
+.phase-card.current { border-color: var(--sage-3); background: rgba(61,122,97,.08); }
+.phase-card.future  { background: rgba(255,255,255,.03); }
+.phase-num {
+  font-family: 'DM Serif Display', serif; font-size: 64px; color: rgba(255,255,255,.04);
+  position: absolute; right: 20px; top: 10px; line-height: 1;
+}
+.phase-badge { margin-bottom: 16px; }
+.phase-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--white); margin-bottom: 8px; }
+.phase-period { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--sage-3); letter-spacing: .12em; margin-bottom: 20px; }
+.phase-items { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.phase-items li {
+  font-size: 13px; color: rgba(255,255,255,.6); padding-left: 16px; position: relative; line-height: 1.5;
+}
+.phase-items li::before { content: '→'; position: absolute; left: 0; color: var(--sage-3); font-size: 11px; top: 2px; }
+.phase-items li.done { color: var(--sage-3); }
+.phase-items li.done::before { content: '✓'; }
+
+/* STACK SECTION */
+#stack {
+  background: var(--surface);
+  padding: 100px 60px;
+}
+
+.stack-grid { max-width: 960px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px; }
+.stack-card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: var(--r-lg); padding: 24px;
+}
+.stack-card h3 { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.stack-card p { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
+.tech-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.tech-pill {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  padding: 4px 10px; border-radius: 100px;
+  background: var(--surface); border: 1px solid var(--border); color: var(--ink-3);
+}
+.tech-pill.highlight { background: var(--sage-lt); border-color: rgba(61,122,97,.3); color: var(--sage-2); }
+
+/* FOOTER CTA */
+#footer-cta {
+  background: var(--ink);
+  padding: 100px 60px;
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+#footer-cta::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(61,122,97,.2) 0%, transparent 70%);
+}
+.fca-eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .18em; color: var(--sage-3); text-transform: uppercase; margin-bottom: 20px; position: relative; z-index: 1; }
+.fca-h2 { font-family: 'DM Serif Display', serif; font-size: 52px; color: var(--white); margin-bottom: 16px; position: relative; z-index: 1; max-width: 600px; margin-left: auto; margin-right: auto; }
+.fca-sub { font-size: 15px; color: rgba(255,255,255,.5); max-width: 480px; margin: 0 auto 36px; line-height: 1.7; position: relative; z-index: 1; }
+.fca-ctas { display: flex; align-items: center; justify-content: center; gap: 14px; position: relative; z-index: 1; }
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp .6s ease both; }
+.delay-1 { animation-delay: .1s; }
+.delay-2 { animation-delay: .2s; }
+.delay-3 { animation-delay: .3s; }
+.delay-4 { animation-delay: .4s; }
+.delay-5 { animation-delay: .5s; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .3; }
+}
+.live-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--sage-3);
+  animation: pulse-dot 2s ease-in-out infinite;
+  display: inline-block;
+}
+
+/* Section label */
+.section-label {
+  font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--muted);
+  display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); max-width: 40px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 1: HERO / MARKETING LANDING
+     ══════════════════════════════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-grain"></div>
+  <div class="hero-glow"></div>
+
+  <nav class="hero-nav">
+    <div class="logo">
+      <div class="logo-mark">⬡</div>
+      FinanceOS
+    </div>
+    <ul class="nav-links">
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#roadmap">Roadmap</a></li>
+      <li><a href="#stack">Tech Stack</a></li>
+    </ul>
+    <div style="display:flex;gap:10px">
+      <a class="btn btn-ghost" href="#login-screen">Sign In</a>
+      <a class="btn btn-primary" href="#dashboard-screen">View Demo →</a>
+    </div>
+  </nav>
+
+  <div class="hero-body">
+    <div class="hero-eyebrow fade-up">SMB Financial Intelligence Platform</div>
+
+    <h1 class="hero-h1 fade-up delay-1">
+      Your business finances,<br><em>finally legible.</em>
+    </h1>
+
+    <p class="hero-sub fade-up delay-2">
+      FinanceOS converts raw financial data into a weekly decision brief that tells you exactly what to do, by when, and what it's worth in dollars.
+    </p>
+
+    <div class="hero-ctas fade-up delay-3">
+      <a class="btn btn-primary" href="#dashboard-screen">See the Dashboard →</a>
+      <a class="btn btn-ghost" href="#login-screen">View Login Screen</a>
+      <a class="btn btn-ghost" href="#architecture">System Architecture</a>
+    </div>
+
+    <div class="hero-stats fade-up delay-4">
+      <div class="stat">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Intelligence Modules</div>
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat">
+        <div class="stat-num">90d</div>
+        <div class="stat-label">Cash Runway Forecast</div>
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat">
+        <div class="stat-num">Weekly</div>
+        <div class="stat-label">Auto Decision Brief</div>
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat">
+        <div class="stat-num">Zero</div>
+        <div class="stat-label">Accounting Knowledge Required</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 2: LOGIN SCREEN (what clients see)
+     ══════════════════════════════════════════════════════════════════════ -->
+<section id="login-screen">
+  <div class="login-left">
+    <div class="login-logo">
+      <div class="logo-mark" style="background:linear-gradient(135deg,#3e7a61,#2d5a47);color:white;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:15px;">⬡</div>
+      FinanceOS
+    </div>
+
+    <h2 class="login-heading">Welcome back.</h2>
+    <p class="login-sub">Your financial intelligence report is ready. Sign in to access your dashboard and this week's decision brief.</p>
+
+    <div class="field">
+      <label>Email address</label>
+      <input type="email" placeholder="owner@austinairllc.com" value="j@austinairllc.com">
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <label>Password</label>
+        <a class="forgot" href="#">Forgot password?</a>
+      </div>
+      <input type="password" placeholder="••••••••••••" value="••••••••••">
+    </div>
+
+    <button class="btn-login" onclick="document.getElementById('dashboard-screen').scrollIntoView({behavior:'smooth'})">
+      Sign In →
+    </button>
+
+    <div class="login-divider">or</div>
+
+    <button class="login-demo" onclick="document.getElementById('dashboard-screen').scrollIntoView({behavior:'smooth'})">
+      Continue with Demo Account
+    </button>
+
+    <div style="margin-top:auto;padding-top:40px">
+      <div style="font-size:11px;color:var(--muted);line-height:1.7;">
+        🔒 Your financial data is encrypted at rest and in transit.<br>
+        FinanceOS never shares or sells business data.
+      </div>
+    </div>
+  </div>
+
+  <div class="login-right">
+    <div class="login-right-bg"></div>
+    <div class="preview-label"><span class="live-dot"></span>&nbsp; Your Weekly Brief is ready — Feb 26, 2026</div>
+
+    <!-- Brief preview card -->
+    <div class="brief-preview">
+      <div class="brief-header">
+        <div class="brief-header-left">
+          <div class="brief-co">Austin Air Solutions LLC</div>
+          <div class="brief-period">FINANCIAL BRIEF  ·  WEEK OF FEB 26, 2026</div>
+        </div>
+        <div class="brief-score">
+          <div class="brief-score-num">74</div>
+          <div class="brief-score-label">Health Score</div>
+        </div>
+      </div>
+
+      <div class="brief-cards">
+        <div class="brief-card">
+          <div class="bc-label">Cash Runway</div>
+          <div class="bc-val">94d</div>
+          <div class="bc-sub" style="color:var(--sage-2);">✅ Healthy</div>
+        </div>
+        <div class="brief-card">
+          <div class="bc-label">Net Margin</div>
+          <div class="bc-val">11.8%</div>
+          <div class="bc-sub" style="color:var(--amber);">🟡 Watch</div>
+        </div>
+        <div class="brief-card">
+          <div class="bc-label">Payroll in</div>
+          <div class="bc-val">11d</div>
+          <div class="bc-sub" style="color:var(--sage-2);">✅ Covered</div>
+        </div>
+      </div>
+
+      <div class="brief-alerts">
+        <div class="alert-row green">
+          <div class="alert-icon">💵</div>
+          <div class="alert-text"><strong>Cash position strong</strong>$109,400 liquid — 94-day runway at current burn.</div>
+        </div>
+        <div class="alert-row amber">
+          <div class="alert-icon">📉</div>
+          <div class="alert-text"><strong>Margin compressing</strong>Net margin down 1.2% over 3 months. Review COGS line items.</div>
+        </div>
+        <div class="alert-row red">
+          <div class="alert-icon">⚠️</div>
+          <div class="alert-text"><strong>$8,800 AR overdue 60+ days</strong>Collect from 2 clients or risk cashflow gap in 45 days.</div>
+        </div>
+      </div>
+
+      <div class="brief-footer">
+        <span class="brief-footer-text mono">3 decisions require your attention this week</span>
+        <a class="brief-cta" href="#dashboard-screen" onclick="document.getElementById('dashboard-screen').scrollIntoView({behavior:'smooth'});return false;">View Full Report →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 3: FULL DASHBOARD (post-login)
+     ══════════════════════════════════════════════════════════════════════ -->
+<section id="dashboard-screen">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark" style="background:linear-gradient(135deg,#3e7a61,#2d5a47);color:white;border-radius:7px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">⬡</div>
+      FinanceOS
+    </div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar">JR</div>
+      <div>
+        <div class="sidebar-user-name">J Rodriguez</div>
+        <div class="sidebar-user-biz">Austin Air Solutions</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active"><span class="nav-icon">⬡</span> Command Center</div>
+      <div class="nav-item"><span class="nav-icon">📊</span> Weekly Brief <span class="badge">New</span></div>
+      <div class="nav-item"><span class="nav-icon">💹</span> P&L Forecast</div>
+
+      <div class="nav-section-label">Intelligence</div>
+      <div class="nav-item"><span class="nav-icon">💵</span> Cash Runway</div>
+      <div class="nav-item"><span class="nav-icon">👥</span> Payroll Risk</div>
+      <div class="nav-item"><span class="nav-icon">📈</span> Revenue Trend</div>
+      <div class="nav-item"><span class="nav-icon">🎯</span> Margin Health</div>
+
+      <div class="nav-section-label">Data Entry</div>
+      <div class="nav-item" onclick="openInputPanel()" style="cursor:pointer"><span class="nav-icon">✏️</span> Monthly Inputs <span class="badge" style="background:var(--gold)">!</span></div>
+      <div class="nav-item"><span class="nav-icon">🧾</span> AR Tracker</div>
+      <div class="nav-item"><span class="nav-icon">📋</span> Obligations</div>
+
+      <div class="nav-section-label">Reports</div>
+      <div class="nav-item"><span class="nav-icon">📄</span> Brief History</div>
+      <div class="nav-item"><span class="nav-icon">⚙️</span> Settings</div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="live-dot"></div>&nbsp; Live  ·  Updated 3h ago
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Command Center</div>
+        <div class="page-sub">Financial intelligence for Austin Air Solutions LLC &nbsp;·&nbsp; Week of Feb 26, 2026</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <button onclick="openInputPanel()" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:100px;background:var(--sage-3);color:white;border:none;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(61,122,97,.4)">
+          ✏️ Enter Your Data
+        </button>
+        <div class="period-selector">
+          <button class="period-btn">Jan</button>
+          <button class="period-btn active">Feb</button>
+          <button class="period-btn">Mar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Health Score Block -->
+    <div class="score-block">
+      <div class="score-main">
+        <div class="score-num" id="dash-score-num">74<span class="score-denom">/100</span></div>
+        <div class="score-label">Financial Health Score</div>
+      </div>
+      <div class="score-divider"></div>
+      <div class="score-components">
+        <div class="score-comp">
+          <div class="sc-num" id="sc-profit">15</div>
+          <div class="sc-bar"><div class="sc-fill" id="sc-profit-bar" style="width:60%"></div></div>
+          <div class="sc-label">Profitability</div>
+        </div>
+        <div class="score-comp">
+          <div class="sc-num" id="sc-runway">22</div>
+          <div class="sc-bar"><div class="sc-fill" id="sc-runway-bar" style="width:88%"></div></div>
+          <div class="sc-label">Runway</div>
+        </div>
+        <div class="score-comp">
+          <div class="sc-num" id="sc-payroll">22</div>
+          <div class="sc-bar"><div class="sc-fill" id="sc-payroll-bar" style="width:88%"></div></div>
+          <div class="sc-label">Payroll Safety</div>
+        </div>
+        <div class="score-comp">
+          <div class="sc-num" id="sc-trend">15</div>
+          <div class="sc-bar"><div class="sc-fill" id="sc-trend-bar" style="width:60%"></div></div>
+          <div class="sc-label">Rev. Trend</div>
+        </div>
+      </div>
+      <div class="score-verdict">
+        <span class="sv-emoji" id="dash-verdict-emoji">🟡</span>
+        <div class="sv-text" id="dash-verdict-text">Needs Attention</div>
+        <div class="sv-sub" id="dash-verdict-sub">2 alerts this week</div>
+      </div>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <div class="kpi-label">Monthly Revenue</div>
+          <div class="kpi-status" id="kpi-rev-icon">📈</div>
+        </div>
+        <div class="kpi-val" id="kpi-rev-val">$151.5K</div>
+        <div class="kpi-sub" id="kpi-rev-sub"><span class="kpi-change up">↑ 24.8%</span> vs last month</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <div class="kpi-label">Net Profit</div>
+          <div class="kpi-status" id="kpi-profit-icon">🟡</div>
+        </div>
+        <div class="kpi-val" id="kpi-profit-val">$17.8K</div>
+        <div class="kpi-sub" id="kpi-profit-sub"><span class="kpi-change dn">↓ 2.1%</span> margin vs last mo</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <div class="kpi-label">Cash Runway</div>
+          <div class="kpi-status" id="kpi-runway-icon">✅</div>
+        </div>
+        <div class="kpi-val" id="kpi-runway-val">94 days</div>
+        <div class="kpi-sub" id="kpi-runway-sub">$109,400 liquid position</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <div class="kpi-label">Payroll Next</div>
+          <div class="kpi-status" id="kpi-payroll-icon">✅</div>
+        </div>
+        <div class="kpi-val" id="kpi-payroll-val">11 days</div>
+        <div class="kpi-sub" id="kpi-payroll-sub">$19,250 · 2.4x cash coverage</div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+      <!-- Revenue trend -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Revenue Trend — 4 Months</div>
+          <span class="tag tag-green"><span class="dot"></span> Growing</span>
+        </div>
+        <div class="panel-body">
+          <div style="display:flex;align-items:flex-end;gap:8px;height:100px;margin-bottom:10px">
+            <!-- bars -->
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+              <div style="flex:1;display:flex;align-items:flex-end;width:100%">
+                <div style="width:100%;height:69%;background:var(--sage-lt);border-radius:4px 4px 0 0"></div>
+              </div>
+              <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)">NOV</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+              <div style="flex:1;display:flex;align-items:flex-end;width:100%">
+                <div style="width:100%;height:74%;background:var(--sage-lt);border-radius:4px 4px 0 0"></div>
+              </div>
+              <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)">DEC</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+              <div style="flex:1;display:flex;align-items:flex-end;width:100%">
+                <div style="width:100%;height:80%;background:var(--sage-lt);border-radius:4px 4px 0 0"></div>
+              </div>
+              <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)">JAN</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+              <div style="flex:1;display:flex;align-items:flex-end;width:100%">
+                <div style="width:100%;height:100%;background:var(--sage-3);border-radius:4px 4px 0 0"></div>
+              </div>
+              <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)">FEB</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <div>
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">3 MO AVG</div>
+              <div style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--ink)">$127.9K</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">THIS MONTH</div>
+              <div style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--sage-2)">$151.5K</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AR Aging -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">AR Aging</div>
+          <span class="tag tag-amber"><span class="dot"></span> Watch</span>
+        </div>
+        <div class="panel-body">
+          <div class="ar-track">
+            <div class="ar-fill" style="width:82%"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">0–30 days</div>
+              <div style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--sage-2)">$34,200</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">31–60 days</div>
+              <div style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--amber)">$18,700</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">61–90 days</div>
+              <div style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--red)">$6,400</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">90+ days</div>
+              <div style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--red)">$2,100</div>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:8px;display:flex;justify-content:space-between">
+              <div style="font-size:12px;font-weight:700;color:var(--ink)">Total AR</div>
+              <div style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--ink)">$61,400</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="alerts-section">
+      <div class="section-label">Active Alerts</div>
+      <div class="alerts-grid">
+        <!-- Alert 1 -->
+        <div class="alert-card">
+          <div class="alert-card-header">
+            <div class="alert-card-title">
+              <span>📉</span> Margin Compression
+            </div>
+            <span class="tag tag-amber">Medium Risk</span>
+          </div>
+          <div class="alert-card-body">
+            <p>Net margin has declined from <strong>13.9% → 11.8%</strong> over 3 months (−2.1%). Primary driver: COGS inflation outpacing revenue growth. If trend continues, you'll hit <strong>sub-5% margin within 60 days.</strong></p>
+            <div class="alert-card-action">
+              <span class="action-icon">→</span>
+              Review 3 largest COGS items: direct labor, materials, subcontractors. A 5% cost reduction recovers $7,575/month.
+            </div>
+          </div>
+        </div>
+
+        <!-- Alert 2 -->
+        <div class="alert-card">
+          <div class="alert-card-header">
+            <div class="alert-card-title">
+              <span>⏰</span> AR Aging — Act This Week
+            </div>
+            <span class="tag tag-red">Urgent</span>
+          </div>
+          <div class="alert-card-body">
+            <p><strong>$8,500 in AR is 60+ days outstanding</strong> — at 90 days this converts to a likely write-off. Two clients account for the full balance. Cash impact if uncollected: runway drops from 94 to <strong>86 days.</strong></p>
+            <div class="alert-card-action">
+              <span class="action-icon">→</span>
+              Send formal collection notice to both clients this week. Offer a payment plan if needed. Log in AR Tracker.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekly Brief Full -->
+    <div class="section-label">This Week's Decision Brief</div>
+    <div class="brief-full" style="margin-bottom:40px">
+      <div class="brief-full-header">
+        <div class="bfh-left">
+          <h3>Weekly Financial Brief</h3>
+          <p id="brief-header-date">GENERATED FEB 26, 2026  ·  AUSTIN AIR SOLUTIONS LLC</p>
+        </div>
+        <div class="bfh-right">
+          <span class="tag tag-ghost" id="brief-score-tag">Score: 74 / 100</span>
+          <span class="tag tag-ghost" id="brief-verdict-tag">🟡 Needs Attention</span>
+        </div>
+      </div>
+
+      <div class="brief-sections">
+        <div class="brief-section">
+          <div class="bs-title">Executive Summary</div>
+          <div class="bs-summary" id="brief-summary">
+            Austin Air Solutions had its <strong>strongest revenue month in the trailing 4 months</strong> at $151,500, driven by both service revenue and contract growth. However, <strong>net margin compressed to 11.8%</strong> — the third consecutive monthly decline — signaling that cost structure is not scaling proportionally with revenue. Cash position is healthy at $109,400 (94-day runway), but <strong>$8,500 in overdue AR</strong> should be collected this week to preserve the buffer.
+          </div>
+        </div>
+
+        <div class="brief-section">
+          <div class="bs-title">Top 3 Priority Decisions — This Week</div>
+          <div class="decisions-list" id="brief-decisions">
+            <div class="decision-item" style="border-color:var(--red);background:var(--red-lt)">
+              <div class="decision-rank" style="background:var(--red)">1</div>
+              <div><h4>Collect overdue AR — 2 clients</h4><p>$8,500 outstanding 60+ days. Send collection notice today.</p></div>
+              <div class="impact">$8,500</div>
+            </div>
+            <div class="decision-item" style="border-color:var(--amber);background:var(--amber-lt)">
+              <div class="decision-rank" style="background:var(--amber);color:white">2</div>
+              <div><h4>Audit top 3 COGS line items</h4><p>A 5% cost reduction recovers $7,575/month.</p></div>
+              <div class="impact" style="color:var(--amber)">$7,575/mo</div>
+            </div>
+            <div class="decision-item">
+              <div class="decision-rank">3</div>
+              <div><h4>Provision Q1 tax payment</h4><p>$8,400 estimated quarterly tax due within 30 days.</p></div>
+              <div class="impact" style="color:var(--ink)">$8,400</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="brief-section">
+          <div class="bs-title">Cash Forecast</div>
+          <div class="bs-summary" id="brief-forecast">
+            At current burn rate, projected cash position in <strong>30 days: ~$91,200</strong> and in <strong>60 days: ~$73,000</strong> (base case). Bear case (revenue -20%): 30-day position drops to <strong>~$72,800</strong> — still above minimum safe threshold of $50,000.
+          </div>
+        </div>
+
+        <div class="brief-section" style="background:var(--surface)">
+          <div class="bs-title">Watch Next Month</div>
+          <div class="bs-summary" id="brief-watch">
+            If net margin does not recover to ≥13% in March, implement a mandatory pricing review — your current service rates may not reflect material cost inflation.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /main -->
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 4: ARCHITECTURE
+     ══════════════════════════════════════════════════════════════════════ -->
+<section id="architecture">
+  <div class="arch-header">
+    <div class="arch-eyebrow">System Design</div>
+    <h2 class="arch-h2">How the System Works</h2>
+    <p class="arch-sub">A clean three-layer architecture: owner enters data, the engine runs intelligence, users see only the output. No spreadsheets. No AI visible. No complexity exposed.</p>
+  </div>
+
+  <div class="arch-diagram">
+    <div class="arch-layer">
+      <div class="layer-icon">✏️</div>
+      <div class="layer-title">Data Layer (Owner Input)</div>
+      <ul class="layer-items">
+        <li>Monthly financial form</li>
+        <li>Bank balance fields</li>
+        <li>Revenue breakdown</li>
+        <li>COGS & OPEX entries</li>
+        <li>AR aging entries</li>
+        <li>Upcoming obligations</li>
+        <li>3-month history</li>
+      </ul>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-layer" style="background:var(--ink);border-color:rgba(255,255,255,.1)">
+      <div class="layer-icon">⬡</div>
+      <div class="layer-title" style="color:var(--white)">Intelligence Engine (Hidden)</div>
+      <ul class="layer-items">
+        <li style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.6)">Cash runway model</li>
+        <li style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.6)">Payroll risk calc</li>
+        <li style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.6)">Margin compression</li>
+        <li style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.6)">Revenue trend signal</li>
+        <li style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.6)">Health score (0–100)</li>
+        <li style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.6)">Brief generation API</li>
+        <li style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.6)">Alert trigger logic</li>
+      </ul>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-layer">
+      <div class="layer-icon">📊</div>
+      <div class="layer-title">User Output Layer (What Clients See)</div>
+      <ul class="layer-items">
+        <li>Health score dashboard</li>
+        <li>4 KPI cards</li>
+        <li>Ranked decision list</li>
+        <li>Revenue trend chart</li>
+        <li>AR aging panel</li>
+        <li>Weekly brief PDF</li>
+        <li>Email digest (weekly)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="arch-below">
+    <div class="arch-note">
+      <div class="arch-note-icon">🔒</div>
+      <div>
+        <h4>The AI is never visible to end users</h4>
+        <p>The intelligence engine runs server-side. Users interact with a standard web application — login, dashboard, reports. The brief reads as the product's own analysis. There is no "powered by AI" disclosure in the user flow. Your brand is the product.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 5: BUILD ROADMAP
+     ══════════════════════════════════════════════════════════════════════ -->
+<section id="roadmap">
+  <div class="roadmap-header">
+    <div class="roadmap-eyebrow">Execution Path</div>
+    <h2 class="roadmap-h2">From Concept to Product</h2>
+  </div>
+
+  <div class="phases">
+    <!-- Phase 1 -->
+    <div class="phase-card current">
+      <div class="phase-num">1</div>
+      <div class="phase-badge"><span class="tag tag-green"><span class="dot"></span> You are here</span></div>
+      <div class="phase-title">Manual Proof of Concept</div>
+      <div class="phase-period">NOW — MONTH 1</div>
+      <ul class="phase-items">
+        <li class="done">Spreadsheet intelligence model</li>
+        <li class="done">All 4 calculation engines</li>
+        <li class="done">Weekly brief prompt template</li>
+        <li>Test with 3–5 real businesses</li>
+        <li>Validate insight accuracy</li>
+        <li>Refine signal thresholds</li>
+      </ul>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="phase-card future">
+      <div class="phase-num">2</div>
+      <div class="phase-badge"><span class="tag tag-ghost">Next</span></div>
+      <div class="phase-title">No-Code Web App</div>
+      <div class="phase-period">MONTHS 2–4</div>
+      <ul class="phase-items">
+        <li>Build UI in Webflow or Bubble</li>
+        <li>Form → Airtable data layer</li>
+        <li>Zapier → Claude API call</li>
+        <li>Auto-email weekly brief</li>
+        <li>Login / auth (Memberstack)</li>
+        <li>First 10 paying customers</li>
+      </ul>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="phase-card future">
+      <div class="phase-num">3</div>
+      <div class="phase-badge"><span class="tag tag-ghost">Later</span></div>
+      <div class="phase-title">Full Product</div>
+      <div class="phase-period">MONTHS 5–12</div>
+      <ul class="phase-items">
+        <li>React + Node.js app</li>
+        <li>Bank integration (Plaid)</li>
+        <li>QuickBooks sync</li>
+        <li>Automated data pull</li>
+        <li>Mobile app</li>
+        <li>100+ customers · SaaS revenue</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 6: TECH STACK
+     ══════════════════════════════════════════════════════════════════════ -->
+<section id="stack">
+  <div style="max-width:960px;margin:0 auto">
+    <div class="arch-eyebrow" style="text-align:center;margin-bottom:12px">Implementation</div>
+    <h2 class="arch-h2" style="text-align:center;margin-bottom:8px">No-Code to Full-Code Stack</h2>
+    <p class="arch-sub" style="text-align:center">Pick the layer that matches your current technical capability. Start at Layer 1 today. Graduate as you grow.</p>
+  </div>
+
+  <div class="stack-grid">
+    <div class="stack-card">
+      <h3>⚡ Layer 1 — Today</h3>
+      <p>Zero code. Manual but real. Run this exact system with your current tools for your first clients.</p>
+      <div class="tech-pills">
+        <span class="tech-pill highlight">Excel / Google Sheets</span>
+        <span class="tech-pill highlight">Claude.ai</span>
+        <span class="tech-pill">Email</span>
+        <span class="tech-pill">PDF export</span>
+      </div>
+    </div>
+    <div class="stack-card">
+      <h3>🔧 Layer 2 — Month 2</h3>
+      <p>No-code app. Build a real product your clients log into without writing a line of code.</p>
+      <div class="tech-pills">
+        <span class="tech-pill highlight">Bubble.io</span>
+        <span class="tech-pill highlight">Airtable</span>
+        <span class="tech-pill">Zapier</span>
+        <span class="tech-pill">Memberstack</span>
+        <span class="tech-pill">Anthropic API</span>
+      </div>
+    </div>
+    <div class="stack-card">
+      <h3>🚀 Layer 3 — Month 6+</h3>
+      <p>Production SaaS. Full data integrations, bank sync, automated ingestion, mobile.</p>
+      <div class="tech-pills">
+        <span class="tech-pill highlight">React + TypeScript</span>
+        <span class="tech-pill highlight">Node.js</span>
+        <span class="tech-pill">PostgreSQL</span>
+        <span class="tech-pill">Plaid API</span>
+        <span class="tech-pill">Claude API</span>
+        <span class="tech-pill">AWS</span>
+      </div>
+    </div>
+    <div class="stack-card">
+      <h3>👤 Auth & Users</h3>
+      <p>Each client gets their own secure login. Data is isolated per business. No client sees another's data.</p>
+      <div class="tech-pills">
+        <span class="tech-pill">Memberstack (L2)</span>
+        <span class="tech-pill">Auth0 (L3)</span>
+        <span class="tech-pill">JWT tokens</span>
+        <span class="tech-pill">Row-level security</span>
+      </div>
+    </div>
+    <div class="stack-card">
+      <h3>🤖 Intelligence Engine</h3>
+      <p>The calculation layer and brief generation — runs server-side, invisible to end users.</p>
+      <div class="tech-pills">
+        <span class="tech-pill highlight">Claude API (Sonnet)</span>
+        <span class="tech-pill">Zapier webhook (L2)</span>
+        <span class="tech-pill">Node.js cron (L3)</span>
+        <span class="tech-pill">Structured prompt</span>
+      </div>
+    </div>
+    <div class="stack-card">
+      <h3>📧 Delivery</h3>
+      <p>Weekly brief lands in client email automatically. No client needs to log in to get their report.</p>
+      <div class="tech-pills">
+        <span class="tech-pill">SendGrid</span>
+        <span class="tech-pill">Postmark</span>
+        <span class="tech-pill">HTML email template</span>
+        <span class="tech-pill">PDF attachment</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SECTION 7: FOOTER CTA
+     ══════════════════════════════════════════════════════════════════════ -->
+<section id="footer-cta">
+  <div class="fca-eyebrow">Next Step</div>
+  <h2 class="fca-h2">Start with one real business. This week.</h2>
+  <p class="fca-sub">Open the spreadsheet, enter your own numbers, paste the brief template into Claude, and send the output to one business owner you know. That is the MVP.</p>
+  <div class="fca-ctas">
+    <a class="btn btn-primary" href="#">Download the Spreadsheet</a>
+    <a class="btn btn-ghost" href="#login-screen">View Login Screen</a>
+    <a class="btn btn-ghost" href="#dashboard-screen">Explore Dashboard</a>
+  </div>
+  <div style="margin-top:48px;font-family:'DM Mono',monospace;font-size:10px;color:rgba(255,255,255,.2);letter-spacing:.12em">
+    FINANCEOS · CONCEPT BUILD v1.0 · FEB 2026
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     FINANCIAL INPUT PANEL + INTELLIGENCE ENGINE
+     ══════════════════════════════════════════════════════════════════════ -->
+
+<style>
+/* ── INPUT PANEL OVERLAY ──────────────────────────────────────────────── */
+#input-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(10,10,15,.7);
+  backdrop-filter: blur(4px);
+  align-items: flex-start; justify-content: flex-end;
+}
+#input-overlay.open { display: flex; }
+
+#input-panel {
+  width: 520px; height: 100vh;
+  background: var(--white);
+  overflow-y: auto;
+  box-shadow: -8px 0 60px rgba(0,0,0,.25);
+  animation: slideIn .25s ease;
+}
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+.ip-head {
+  background: var(--ink); padding: 24px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 10;
+}
+.ip-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--white); }
+.ip-sub { font-family: 'DM Mono', monospace; font-size: 10px; color: rgba(255,255,255,.4); margin-top: 3px; letter-spacing: .1em; }
+.ip-close {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,.1); border: none; cursor: pointer;
+  color: white; font-size: 18px; display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.ip-close:hover { background: rgba(255,255,255,.2); }
+
+.ip-body { padding: 28px; }
+
+.ip-section {
+  margin-bottom: 28px;
+}
+.ip-section-title {
+  font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--sage-3);
+  padding-bottom: 10px; border-bottom: 1.5px solid var(--border); margin-bottom: 16px;
+}
+
+.ip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.ip-grid.single { grid-template-columns: 1fr; }
+
+.ip-field { display: flex; flex-direction: column; gap: 6px; }
+.ip-field label {
+  font-size: 11px; font-weight: 700; color: var(--ink-3);
+  letter-spacing: .04em; text-transform: uppercase;
+}
+.ip-field .hint { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; }
+.ip-field input {
+  padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--r);
+  font-family: 'DM Mono', monospace; font-size: 14px; color: var(--ink);
+  background: var(--white); outline: none; transition: border-color .2s;
+  width: 100%;
+}
+.ip-field input:focus { border-color: var(--sage-3); box-shadow: 0 0 0 3px rgba(61,122,97,.1); }
+.ip-field input::placeholder { color: #ccc; }
+
+.ip-submit {
+  width: 100%; padding: 15px; border-radius: var(--r);
+  background: var(--ink); color: var(--white);
+  font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+  border: none; cursor: pointer; transition: all .2s;
+  margin-top: 8px; letter-spacing: .02em;
+}
+.ip-submit:hover { background: var(--sage-2); transform: translateY(-1px); }
+
+.ip-prefill {
+  width: 100%; padding: 11px; border-radius: var(--r);
+  background: var(--surface); border: 1.5px solid var(--border); color: var(--muted);
+  font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .15s; margin-bottom: 16px;
+}
+.ip-prefill:hover { border-color: var(--sage-3); color: var(--sage-2); }
+
+/* ── FLASH ANIMATION on dashboard update ─────────────────────────────── */
+@keyframes flashGreen {
+  0%   { box-shadow: 0 0 0 0 rgba(61,122,97,.6); }
+  50%  { box-shadow: 0 0 0 8px rgba(61,122,97,.0); }
+  100% { box-shadow: none; }
+}
+.flash { animation: flashGreen .6s ease; }
+
+/* ── ALERTS PANEL (dynamic) ──────────────────────────────────────────── */
+#dynamic-alerts { display: flex; flex-direction: column; gap: 10px; }
+</style>
+
+<!-- INPUT OVERLAY -->
+<div id="input-overlay" onclick="overlayClick(event)">
+  <div id="input-panel">
+    <div class="ip-head">
+      <div>
+        <div class="ip-title">Monthly Financial Inputs</div>
+        <div class="ip-sub">ALL NUMBERS UPDATE THE DASHBOARD INSTANTLY</div>
+      </div>
+      <button class="ip-close" onclick="closeInputPanel()">✕</button>
+    </div>
+    <div class="ip-body">
+
+      <button class="ip-prefill" onclick="loadSampleData()">
+        📋 Load Sample Data (HVAC company demo)
+      </button>
+
+      <!-- SECTION 1: Cash & Bank -->
+      <div class="ip-section">
+        <div class="ip-section-title">Cash &amp; Bank Position</div>
+        <div class="ip-grid">
+          <div class="ip-field">
+            <label>Checking Account Balance</label>
+            <span class="hint">What's in your main bank account right now</span>
+            <input type="number" id="f-checking" placeholder="87400" min="0">
+          </div>
+          <div class="ip-field">
+            <label>Savings / Reserve Account</label>
+            <span class="hint">Any secondary accounts</span>
+            <input type="number" id="f-savings" placeholder="22000" min="0">
+          </div>
+          <div class="ip-field">
+            <label>Credit Line Available</label>
+            <span class="hint">Unused credit line balance</span>
+            <input type="number" id="f-credit" placeholder="38000" min="0">
+          </div>
+          <div class="ip-field">
+            <label>AR Current (0–30 days)</label>
+            <span class="hint">Invoices you expect to collect soon</span>
+            <input type="number" id="f-ar-current" placeholder="34200" min="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: Revenue -->
+      <div class="ip-section">
+        <div class="ip-section-title">Revenue — This Month</div>
+        <div class="ip-grid">
+          <div class="ip-field">
+            <label>Total Revenue This Month</label>
+            <span class="hint">All income received or earned</span>
+            <input type="number" id="f-revenue" placeholder="151500" min="0">
+          </div>
+          <div class="ip-field">
+            <label>Revenue Last Month</label>
+            <span class="hint">For trend calculation</span>
+            <input type="number" id="f-rev-last" placeholder="121400" min="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: Expenses -->
+      <div class="ip-section">
+        <div class="ip-section-title">Expenses — This Month</div>
+        <div class="ip-grid">
+          <div class="ip-field">
+            <label>Cost of Goods Sold (COGS)</label>
+            <span class="hint">Direct costs: labor, materials, subs</span>
+            <input type="number" id="f-cogs" placeholder="53500" min="0">
+          </div>
+          <div class="ip-field">
+            <label>Operating Expenses (OPEX)</label>
+            <span class="hint">Overhead: rent, software, marketing, owner draw</span>
+            <input type="number" id="f-opex" placeholder="66230" min="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: Payroll -->
+      <div class="ip-section">
+        <div class="ip-section-title">Payroll</div>
+        <div class="ip-grid">
+          <div class="ip-field">
+            <label>Next Payroll Amount ($)</label>
+            <span class="hint">Total gross amount of next payroll run</span>
+            <input type="number" id="f-payroll-amt" placeholder="19250" min="0">
+          </div>
+          <div class="ip-field">
+            <label>Days Until Next Payroll</label>
+            <span class="hint">How many days until payroll is due</span>
+            <input type="number" id="f-payroll-days" placeholder="11" min="0" max="31">
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 5: AR + Obligations -->
+      <div class="ip-section">
+        <div class="ip-section-title">Overdue AR &amp; Upcoming Bills</div>
+        <div class="ip-grid">
+          <div class="ip-field">
+            <label>AR Overdue 60+ Days</label>
+            <span class="hint">Money owed to you more than 60 days</span>
+            <input type="number" id="f-ar-overdue" placeholder="8500" min="0">
+          </div>
+          <div class="ip-field">
+            <label>Bills Due Next 30 Days</label>
+            <span class="hint">Tax, vendors, loan payments due soon</span>
+            <input type="number" id="f-bills" placeholder="22550" min="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 6: Business Name -->
+      <div class="ip-section">
+        <div class="ip-section-title">Business Info</div>
+        <div class="ip-grid single">
+          <div class="ip-field">
+            <label>Business Name</label>
+            <input type="text" id="f-bizname" placeholder="Austin Air Solutions LLC">
+          </div>
+        </div>
+      </div>
+
+      <button class="ip-submit" onclick="runEngine()">
+        ⚡ Calculate &amp; Update Dashboard
+      </button>
+
+    </div><!-- /ip-body -->
+  </div><!-- /input-panel -->
+</div><!-- /input-overlay -->
+
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// FINANCEOS INTELLIGENCE ENGINE — v1.0
+// All calculations happen here. No external services needed.
+// ═══════════════════════════════════════════════════════════════════════════
+
+function openInputPanel()  { document.getElementById('input-overlay').classList.add('open'); }
+function closeInputPanel() { document.getElementById('input-overlay').classList.remove('open'); }
+function overlayClick(e)   { if (e.target === document.getElementById('input-overlay')) closeInputPanel(); }
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function $(id)          { return document.getElementById(id); }
+function fv(id)         { return parseFloat($(id).value) || 0; }
+function fmt$(n)        { return '$' + Math.abs(Math.round(n)).toLocaleString(); }
+function fmtK(n)        { return (n >= 1000 || n <= -1000) ? '$' + (n/1000).toFixed(1) + 'K' : fmt$(n); }
+function fmtPct(n)      { return (n * 100).toFixed(1) + '%'; }
+
+function flash(id) {
+  const el = $(id);
+  if (!el) return;
+  el.classList.remove('flash');
+  void el.offsetWidth; // reflow trick to restart animation
+  el.classList.add('flash');
+}
+
+// ── Load sample data (HVAC demo) ───────────────────────────────────────────
+function loadSampleData() {
+  const s = {
+    'f-checking':    87400,
+    'f-savings':     22000,
+    'f-credit':      38000,
+    'f-ar-current':  34200,
+    'f-revenue':     151500,
+    'f-rev-last':    121400,
+    'f-cogs':        53500,
+    'f-opex':        80230,
+    'f-payroll-amt': 19250,
+    'f-payroll-days':11,
+    'f-ar-overdue':  8500,
+    'f-bills':       22550,
+    'f-bizname':     'Austin Air Solutions LLC'
+  };
+  Object.entries(s).forEach(([id, val]) => { $(id).value = val; });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MAIN ENGINE — called when user hits "Calculate"
+// ═══════════════════════════════════════════════════════════════════════════
+function runEngine() {
+
+  // ── 1. Read inputs ────────────────────────────────────────────────────
+  const checking    = fv('f-checking');
+  const savings     = fv('f-savings');
+  const credit      = fv('f-credit');
+  const arCurrent   = fv('f-ar-current');
+  const revenue     = fv('f-revenue');
+  const revLast     = fv('f-rev-last');
+  const cogs        = fv('f-cogs');
+  const opex        = fv('f-opex');
+  const payrollAmt  = fv('f-payroll-amt');
+  const payrollDays = fv('f-payroll-days');
+  const arOverdue   = fv('f-ar-overdue');
+  const bills       = fv('f-bills');
+  const bizName     = $('f-bizname').value.trim() || 'Your Business';
+
+  // ── 2. Core Calculations ──────────────────────────────────────────────
+
+  // Liquidity
+  const liquidPosition  = checking + savings + (arCurrent * 0.70);  // 70% AR collectible
+  const totalCash       = checking + savings;
+
+  // Profitability
+  const grossProfit     = revenue - cogs;
+  const grossMargin     = revenue > 0 ? grossProfit / revenue : 0;
+  const netProfit       = grossProfit - opex;
+  const netMargin       = revenue > 0 ? netProfit / revenue : 0;
+
+  // Burn & Runway
+  const monthlyBurn     = cogs + opex;
+  const cashRunwayMonths= monthlyBurn > 0 ? liquidPosition / monthlyBurn : 99;
+  const cashRunwayDays  = Math.round(cashRunwayMonths * 30);
+
+  // 30-day Cash Forecast
+  const cash30Base      = totalCash + (revenue * 0.85) - monthlyBurn - bills;
+  const cash30Bear      = totalCash + (revenue * 0.70) - monthlyBurn - bills;
+  const cash60Base      = cash30Base + (revenue * 0.85) - monthlyBurn;
+
+  // Payroll Risk
+  const payrollCoverage = payrollAmt > 0 ? totalCash / payrollAmt : 99;
+  const arHelpPayroll   = payrollDays <= 15 ? arCurrent * 0.6 : arCurrent * 0.8;
+  const payrollSurplus  = totalCash + arHelpPayroll - payrollAmt;
+
+  // Revenue Trend
+  const revTrendPct     = revLast > 0 ? (revenue - revLast) / revLast : 0;
+
+  // ── 3. Score Sub-components (each 0–25) ──────────────────────────────
+
+  // Profitability Score
+  let scoreProfitability = 0;
+  if      (netMargin >= 0.20) scoreProfitability = 25;
+  else if (netMargin >= 0.15) scoreProfitability = 22;
+  else if (netMargin >= 0.10) scoreProfitability = 18;
+  else if (netMargin >= 0.05) scoreProfitability = 12;
+  else if (netMargin >= 0)    scoreProfitability = 6;
+  else                        scoreProfitability = 0;
+
+  // Runway Score
+  let scoreRunway = 0;
+  if      (cashRunwayMonths >= 9)  scoreRunway = 25;
+  else if (cashRunwayMonths >= 6)  scoreRunway = 22;
+  else if (cashRunwayMonths >= 4)  scoreRunway = 17;
+  else if (cashRunwayMonths >= 3)  scoreRunway = 12;
+  else if (cashRunwayMonths >= 1)  scoreRunway = 6;
+  else                             scoreRunway = 0;
+
+  // Payroll Safety Score
+  let scorePayroll = 0;
+  if      (payrollAmt === 0)        scorePayroll = 20; // no payroll entered
+  else if (payrollCoverage >= 3.0)  scorePayroll = 25;
+  else if (payrollCoverage >= 2.0)  scorePayroll = 22;
+  else if (payrollCoverage >= 1.5)  scorePayroll = 16;
+  else if (payrollCoverage >= 1.2)  scorePayroll = 10;
+  else if (payrollCoverage >= 1.0)  scorePayroll = 5;
+  else                              scorePayroll = 0;
+
+  // Revenue Trend Score
+  let scoreTrend = 0;
+  if      (revLast === 0)          scoreTrend = 15; // no prior data
+  else if (revTrendPct >= 0.10)    scoreTrend = 25;
+  else if (revTrendPct >= 0.03)    scoreTrend = 20;
+  else if (revTrendPct >= -0.02)   scoreTrend = 14;
+  else if (revTrendPct >= -0.10)   scoreTrend = 8;
+  else                             scoreTrend = 3;
+
+  const totalScore = scoreProfitability + scoreRunway + scorePayroll + scoreTrend;
+
+  // ── 4. Verdict Labels ─────────────────────────────────────────────────
+  function runwayStatus(d) {
+    if (d >= 180) return {emoji:'✅', text:'Solid', color:'var(--sage-3)'};
+    if (d >= 90)  return {emoji:'✅', text:'Healthy', color:'var(--sage-3)'};
+    if (d >= 60)  return {emoji:'🟡', text:'Watch', color:'var(--amber)'};
+    if (d >= 30)  return {emoji:'🟠', text:'Tight', color:'var(--amber)'};
+    return            {emoji:'🔴', text:'Critical', color:'var(--red)'};
+  }
+  function marginStatus(m) {
+    if (m >= 0.20) return {emoji:'✅', text:'Strong'};
+    if (m >= 0.10) return {emoji:'✅', text:'Healthy'};
+    if (m >= 0.05) return {emoji:'🟡', text:'Thin'};
+    if (m >= 0)    return {emoji:'🟠', text:'Barely Breaking Even'};
+    return             {emoji:'🔴', text:'Losing Money'};
+  }
+  function payrollStatus(cov) {
+    if (payrollAmt === 0)  return {emoji:'—', text:'No payroll entered'};
+    if (cov >= 2.5) return {emoji:'✅', text:'Covered'};
+    if (cov >= 1.5) return {emoji:'🟡', text:'Adequate'};
+    if (cov >= 1.0) return {emoji:'🟠', text:'Tight'};
+    return              {emoji:'🔴', text:'At Risk'};
+  }
+  function scoreVerdict(s) {
+    if (s >= 85) return {emoji:'✅', text:'Healthy', sub:'Strong across all metrics'};
+    if (s >= 70) return {emoji:'🟡', text:'Needs Attention', sub:'Review alerts below'};
+    if (s >= 50) return {emoji:'🟠', text:'At Risk', sub:'Act on priority items'};
+    return           {emoji:'🔴', text:'Critical', sub:'Immediate action required'};
+  }
+
+  const rv  = runwayStatus(cashRunwayDays);
+  const mv  = marginStatus(netMargin);
+  const pv  = payrollStatus(payrollCoverage);
+  const sv  = scoreVerdict(totalScore);
+
+  // ── 5. UPDATE DASHBOARD ───────────────────────────────────────────────
+
+  // Health Score block
+  $('dash-score-num').innerHTML = totalScore + '<span class="score-denom">/100</span>';
+  $('dash-verdict-emoji').textContent  = sv.emoji;
+  $('dash-verdict-text').textContent   = sv.text;
+  $('dash-verdict-sub').textContent    = sv.sub;
+
+  // Score sub-components
+  $('sc-profit').textContent = scoreProfitability;
+  $('sc-runway').textContent = scoreRunway;
+  $('sc-payroll').textContent = scorePayroll;
+  $('sc-trend').textContent  = scoreTrend;
+  $('sc-profit-bar').style.width  = (scoreProfitability / 25 * 100) + '%';
+  $('sc-runway-bar').style.width  = (scoreRunway / 25 * 100) + '%';
+  $('sc-payroll-bar').style.width = (scorePayroll / 25 * 100) + '%';
+  $('sc-trend-bar').style.width   = (scoreTrend / 25 * 100) + '%';
+
+  // KPI Cards
+  $('kpi-rev-val').textContent   = fmtK(revenue);
+  $('kpi-rev-icon').textContent  = revTrendPct >= 0.03 ? '📈' : revTrendPct >= -0.03 ? '➡️' : '📉';
+  $('kpi-rev-sub').innerHTML     = revLast > 0
+    ? `<span class="kpi-change ${revTrendPct >= 0 ? 'up' : 'dn'}">${revTrendPct >= 0 ? '↑' : '↓'} ${fmtPct(Math.abs(revTrendPct))}</span> vs last month`
+    : 'Enter last month revenue for trend';
+
+  $('kpi-profit-val').textContent  = fmtK(netProfit);
+  $('kpi-profit-icon').textContent = mv.emoji;
+  $('kpi-profit-sub').innerHTML    = `<span class="kpi-change ${netMargin >= 0.10 ? 'up' : 'dn'}">${mv.emoji}</span> ${fmtPct(netMargin)} net margin`;
+
+  $('kpi-runway-val').textContent  = cashRunwayDays >= 999 ? '∞' : cashRunwayDays + ' days';
+  $('kpi-runway-icon').textContent = rv.emoji;
+  $('kpi-runway-sub').textContent  = fmt$(totalCash) + ' liquid position';
+
+  $('kpi-payroll-val').textContent  = payrollAmt > 0 ? payrollDays + ' days' : 'Not entered';
+  $('kpi-payroll-icon').textContent = pv.emoji;
+  $('kpi-payroll-sub').textContent  = payrollAmt > 0
+    ? fmt$(payrollAmt) + ' · ' + payrollCoverage.toFixed(1) + 'x cash coverage'
+    : 'Enter payroll in inputs';
+
+  // Flash all KPI cards
+  document.querySelectorAll('.kpi-card, .score-block').forEach(el => {
+    el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+  });
+
+  // ── 6. GENERATE WEEKLY BRIEF ──────────────────────────────────────────
+  const today = new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}).toUpperCase();
+
+  $('brief-header-date').textContent = `GENERATED ${today}  ·  ${bizName.toUpperCase()}`;
+  $('brief-score-tag').textContent   = `Score: ${totalScore} / 100`;
+  $('brief-verdict-tag').textContent = `${sv.emoji} ${sv.text}`;
+
+  // Executive Summary
+  const revDir      = revTrendPct >= 0.03 ? 'up' : revTrendPct >= -0.03 ? 'flat' : 'down';
+  const revDirWord  = revDir === 'up' ? 'growing' : revDir === 'flat' ? 'stable' : 'declining';
+  const marginWord  = netMargin >= 0.15 ? 'healthy' : netMargin >= 0.08 ? 'thin but positive' : netMargin >= 0 ? 'dangerously thin' : 'negative — losing money';
+  const runwayWord  = cashRunwayDays >= 120 ? 'strong' : cashRunwayDays >= 60 ? 'adequate' : cashRunwayDays >= 30 ? 'tight' : 'critical';
+
+  $('brief-summary').innerHTML = `
+    ${bizName} generated <strong>${fmtK(revenue)} in revenue this month</strong> — ${revDirWord} 
+    ${revLast > 0 ? '(' + (revTrendPct >= 0 ? '+' : '') + fmtPct(revTrendPct) + ' vs last month)' : '(enter last month for trend)'}.
+    Net margin is <strong>${fmtPct(netMargin)} — ${marginWord}</strong>, 
+    with gross profit of ${fmtK(grossProfit)} after ${fmtK(cogs)} in direct costs.
+    Cash runway is <strong>${runwayWord} at ${cashRunwayDays >= 999 ? 'solid' : cashRunwayDays + ' days'}</strong> 
+    (${fmtK(monthlyBurn)}/month burn rate).
+    ${arOverdue > 0 ? `<strong>${fmt$(arOverdue)} in AR is overdue 60+ days</strong> — collect this week.` : 'AR aging is clean — no overdue receivables flagged.'}
+  `;
+
+  // Priority Decisions
+  const decisions = buildDecisions({
+    netMargin, netProfit, cashRunwayDays, payrollCoverage, payrollAmt,
+    payrollDays, payrollSurplus, arOverdue, bills, revenue, cogs, opex,
+    revTrendPct, totalCash, liquidPosition
+  });
+
+  $('brief-decisions').innerHTML = decisions.map((d, i) => `
+    <div class="decision-item" style="border-color:${d.color};background:${d.bg}">
+      <div class="decision-rank" style="background:${d.color};color:white">${i+1}</div>
+      <div>
+        <h4>${d.title}</h4>
+        <p>${d.body}</p>
+      </div>
+      <div class="impact" style="color:${d.color}">${d.impact}</div>
+    </div>
+  `).join('');
+
+  // Cash Forecast
+  $('brief-forecast').innerHTML = `
+    At current burn rate of <strong>${fmtK(monthlyBurn)}/month</strong>, projected cash position:
+    <strong>30 days: ${cash30Base > 0 ? fmt$(cash30Base) : '<span style="color:var(--red)">'+fmt$(cash30Base)+'</span>'}</strong> (base) / 
+    <strong>${cash30Bear > 0 ? fmt$(cash30Bear) : '<span style="color:var(--red)">'+fmt$(cash30Bear)+'</span>'}</strong> (bear −20% revenue).
+    <br>60-day base case: <strong>${cash60Base > 0 ? fmt$(cash60Base) : '<span style="color:var(--red)">'+fmt$(cash60Base)+'</span>'}</strong>.
+    ${cash30Bear < 0 ? '<br><strong style="color:var(--red)">⚠ Bear case goes negative in 30 days — review costs immediately.</strong>' : ''}
+  `;
+
+  // Watch Next Month
+  const watchItems = [];
+  if (netMargin < 0.15) watchItems.push(`Net margin (${fmtPct(netMargin)}) needs to reach 15% — audit COGS for cost inflation`);
+  if (cashRunwayDays < 90) watchItems.push(`Cash runway (${cashRunwayDays}d) is below 90-day safety threshold — avoid large discretionary spend`);
+  if (arOverdue > revenue * 0.05) watchItems.push(`Overdue AR (${fmt$(arOverdue)}) exceeds 5% of monthly revenue — escalate collection`);
+  if (watchItems.length === 0) watchItems.push('Metrics are healthy — focus on revenue growth and maintaining current discipline');
+  $('brief-watch').textContent = watchItems.join('. ') + '.';
+
+  // Close panel and scroll to dashboard
+  closeInputPanel();
+  document.getElementById('dashboard-screen').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── Build Priority Decisions List ─────────────────────────────────────────
+function buildDecisions(d) {
+  const decisions = [];
+
+  // Payroll risk — always first if at risk
+  if (d.payrollAmt > 0 && d.payrollCoverage < 1.5) {
+    decisions.push({
+      title: 'Payroll at risk — act within ' + Math.max(1, d.payrollDays - 3) + ' days',
+      body:  'Cash covers only ' + d.payrollCoverage.toFixed(1) + 'x of next payroll (' + fmt$(d.payrollAmt) + '). '
+           + (d.payrollSurplus < 0 ? 'Shortfall: ' + fmt$(Math.abs(d.payrollSurplus)) + '. ' : '')
+           + 'Accelerate AR collection or draw credit line immediately.',
+      impact: fmt$(d.payrollAmt),
+      color:  'var(--red)', bg: 'var(--red-lt)'
+    });
+  }
+
+  // Overdue AR
+  if (d.arOverdue > 0) {
+    decisions.push({
+      title: 'Collect overdue AR — 60+ days outstanding',
+      body:  fmt$(d.arOverdue) + ' has been outstanding for 60+ days. At 90 days this likely converts to a write-off. Send a formal collection notice this week.',
+      impact: fmt$(d.arOverdue),
+      color: d.arOverdue > d.revenue * 0.10 ? 'var(--red)' : 'var(--amber)',
+      bg:    d.arOverdue > d.revenue * 0.10 ? 'var(--red-lt)' : 'var(--amber-lt)'
+    });
+  }
+
+  // Margin pressure
+  if (d.netMargin < 0.10 && d.netMargin >= 0) {
+    const recovery = d.cogs * 0.05;
+    decisions.push({
+      title: 'Margin thin — audit direct costs',
+      body:  'Net margin of ' + fmtPct(d.netMargin) + ' is below the 10% threshold. A 5% reduction in COGS ('
+           + fmt$(d.cogs) + ') would recover ' + fmt$(recovery) + '/month and restore healthy margins.',
+      impact: '+' + fmt$(recovery) + '/mo',
+      color: 'var(--amber)', bg: 'var(--amber-lt)'
+    });
+  }
+
+  // Losing money
+  if (d.netMargin < 0) {
+    decisions.push({
+      title: 'Business is operating at a loss — immediate review required',
+      body:  'Revenue (' + fmtK(d.revenue) + ') is not covering total costs (' + fmtK(d.cogs + d.opex) + '). Loss of ' + fmt$(Math.abs(d.netProfit)) + ' this month. Identify the 3 largest expense items and cut or defer what you can.',
+      impact: 'Loss: ' + fmt$(Math.abs(d.netProfit)),
+      color: 'var(--red)', bg: 'var(--red-lt)'
+    });
+  }
+
+  // Cash runway warning
+  if (d.cashRunwayDays < 60 && d.cashRunwayDays > 0) {
+    decisions.push({
+      title: 'Cash runway below 60 days — preserve cash now',
+      body:  'At current burn (' + fmtK(d.cogs + d.opex) + '/mo), cash runs out in ' + d.cashRunwayDays + ' days. Defer all non-essential expenses. Consider accelerating 1 large project or client payment.',
+      impact: d.cashRunwayDays + ' days left',
+      color: 'var(--red)', bg: 'var(--red-lt)'
+    });
+  }
+
+  // Revenue declining
+  if (d.revTrendPct < -0.08) {
+    decisions.push({
+      title: 'Revenue declining — client outreach required',
+      body:  'Revenue dropped ' + fmtPct(Math.abs(d.revTrendPct)) + ' vs last month. Identify which clients reduced spend or churned. Schedule calls with top 3 clients this week.',
+      impact: fmt$(d.revenue - (d.revenue / (1 + d.revTrendPct))),
+      color: 'var(--amber)', bg: 'var(--amber-lt)'
+    });
+  }
+
+  // Positive growth signal
+  if (decisions.length < 2 && d.revTrendPct > 0.05 && d.netMargin > 0.12) {
+    decisions.push({
+      title: 'Growth momentum — consider adding recurring revenue',
+      body:  'Revenue is up ' + fmtPct(d.revTrendPct) + ' and margins are healthy. This is the right window to convert service clients to annual contracts — locks in revenue and reduces variability.',
+      impact: 'Opportunity',
+      color: 'var(--sage-3)', bg: 'var(--sage-lt)'
+    });
+  }
+
+  // Fallback if all metrics are healthy
+  if (decisions.length === 0) {
+    decisions.push({
+      title: 'All metrics healthy — focus on growth',
+      body:  'No urgent financial issues detected. Prioritize filling your pipeline for next month and consider whether pricing reflects current market rates.',
+      impact: '✅ Solid',
+      color: 'var(--sage-3)', bg: 'var(--sage-lt)'
+    });
+  }
+
+  return decisions.slice(0, 3); // max 3 decisions
+}
+</script>
+
+</body>
+</html>
