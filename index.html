@@ -731,6 +731,35 @@ body {
 </head>
 <body>
 
+<!-- ── ACCESS GATE ──────────────────────────────────────────────────────── -->
+<style>
+#access-gate {
+  position: fixed; inset: 0; z-index: 99999;
+  background: #0a0a0f;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 20px;
+}
+#access-gate h2 { font-family: 'DM Serif Display', serif; font-size: 32px; color: white; }
+#access-gate input {
+  padding: 14px 20px; border-radius: 8px; border: 1.5px solid #333;
+  background: #1c1c28; color: white; font-size: 16px;
+  font-family: 'Syne', sans-serif; outline: none; width: 280px; text-align: center;
+}
+#access-gate button {
+  padding: 13px 32px; border-radius: 100px; background: #3e7a61;
+  color: white; border: none; font-size: 15px; font-weight: 700;
+  font-family: 'Syne', sans-serif; cursor: pointer;
+}
+#access-gate .gate-error { color: #c0392b; font-size: 13px; display: none; }
+</style>
+<div id="access-gate">
+  <h2>⬡ FinanceOS</h2>
+  <p style="color:rgba(255,255,255,.4);font-size:14px;font-family:'Syne',sans-serif">Enter your access code to continue</p>
+  <input type="password" id="gate-input" placeholder="Access code" onkeydown="if(event.key==='Enter')checkGate()">
+  <button onclick="checkGate()">Enter Dashboard →</button>
+  <p class="gate-error" id="gate-error">Incorrect code. Try again.</p>
+</div>
+
 <!-- ══════════════════════════════════════════════════════════════════════════
      SECTION 1: HERO / MARKETING LANDING
      ══════════════════════════════════════════════════════════════════════ -->
@@ -1698,6 +1727,50 @@ function flash(id) {
   el.classList.add('flash');
 }
 
+// ── SAVE inputs to browser storage ───────────────────────────────────────
+function saveInputsToStorage() {
+  const fields = [
+    'f-checking','f-savings','f-credit','f-ar-current',
+    'f-revenue','f-rev-last','f-cogs','f-opex',
+    'f-payroll-amt','f-payroll-days','f-ar-overdue','f-bills','f-bizname'
+  ];
+  const data = {};
+  fields.forEach(id => { const el = document.getElementById(id); if (el) data[id] = el.value; });
+  localStorage.setItem('financeos_inputs', JSON.stringify(data));
+}
+
+// ── LOAD saved inputs when page opens ────────────────────────────────────
+function loadInputsFromStorage() {
+  const saved = localStorage.getItem('financeos_inputs');
+  if (!saved) return;
+  try {
+    const data = JSON.parse(saved);
+    Object.entries(data).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.value = val; });
+    runEngine();
+  } catch(e) {}
+}
+
+// ── ACCESS GATE ───────────────────────────────────────────────────────────
+const ACCESS_CODE = 'financeos2026'; // ← change this to your own password
+
+function checkGate() {
+  const input = document.getElementById('gate-input').value;
+  if (input === ACCESS_CODE) {
+    document.getElementById('access-gate').style.display = 'none';
+    localStorage.setItem('fos_auth', ACCESS_CODE);
+  } else {
+    document.getElementById('gate-error').style.display = 'block';
+  }
+}
+
+// ── ON PAGE LOAD: skip gate if already authed, then restore saved data ───
+window.addEventListener('load', function() {
+  if (localStorage.getItem('fos_auth') === ACCESS_CODE) {
+    document.getElementById('access-gate').style.display = 'none';
+  }
+  loadInputsFromStorage();
+});
+
 // ── Load sample data (HVAC demo) ───────────────────────────────────────────
 function loadSampleData() {
   const s = {
@@ -1948,6 +2021,7 @@ function runEngine() {
   // Close panel and scroll to dashboard
   closeInputPanel();
   document.getElementById('dashboard-screen').scrollIntoView({ behavior: 'smooth' });
+  saveInputsToStorage();
 }
 
 // ── Build Priority Decisions List ─────────────────────────────────────────
